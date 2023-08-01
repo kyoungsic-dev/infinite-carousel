@@ -1,0 +1,175 @@
+﻿@charset "utf-8";
+* {
+  box-sizing: border-box;
+  word-break: keep-all;
+  line-height: 1.4em;
+}
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+font,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+p,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  background: transparent;
+}
+html {
+  overflow-y: scroll;
+  -webkit-text-size-adjust: 100%;
+}
+html,
+body {
+  width: 100%;
+  font-size: 14px;
+  background-color: #fff;
+  margin: 0 auto;
+}
+body {
+  font-size: 1em;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #000;
+}
+select,
+input,
+textarea,
+button {
+  font-size: 1em;
+  font-family: 'Noto Sans KR', sans-serif;
+  vertical-align: middle;
+  color: #000;
+  outline: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+}
+button {
+  cursor: pointer;
+}
+a {
+  outline: none;
+  color: #000;
+  text-decoration: none;
+}
+input[type='text'],
+input[type='password'] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+input::placeholder {
+  color: #bbb;
+}
+textarea {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -webkit-overflow-scrolling: touch;
+  -moz-overflow-scrolling: touch;
+  -o-overflow-scrolling: touch;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: 100%;
+  font-weight: normal;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  vertical-align: top;
+}
+th {
+  font-size: 1em;
+}
+img,
+fieldset {
+  border: 0px;
+}
+img {
+  display: block;
+  max-width: 100%;
+}
+ol,
+ul {
+  list-style: none;
+}
+hr {
+  border: 0;
+  height: 1px;
+  background: #ddd;
+}
+label {
+  cursor: pointer;
+}
+legend,
+caption {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-size: 0;
+  line-height: 0;
+}
+em {
+  font-style: normal;
+}
+ins {
+  text-decoration: none;
+}

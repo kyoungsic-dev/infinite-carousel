@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Noto+Sans+KR:100,300,400,500,700,900&display=swap&subset=korean"
+      rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
+      rel="stylesheet" />
+    <link rel="stylesheet" href="./css/base.css" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/atom-one-dark.min.css" />
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"
+      integrity="sha512-f8mwTB+Bs8a5c46DEm7HQLcJuHMBaH/UFlcgyetMqqkvTcYg4g5VXsYR71b3qC82lZytjNYvBj2pf0VekA9/FQ=="
+      crossorigin="anonymous"></script>
+    <title>Infinite Carousel</title>
+  </head>
+
+  <body>
+    <div id="viewport">
+      <header>
+        <div class="inner">
+          <h1>Infinite Carousel</h1>
+          <a href="https://github.com/kyoungsic-dev/infinite-carousel" target="_blank">Github</a>
+        </div>
+      </header>
+
+      <section class="demo-body">
+        <div class="inner">
+          <div class="demo-body__top">
+            <h1>Infinite Carousel</h1>
+            <p>
+              GSAP 라이브러리를 기반으로 만든 가로로 무한히 반복되는 Carousel입니다. <br />
+              비동기적으로 노드를 삭제하고 다시 생성하여 메모리를 불필요하게 낭비하지 않고 노드를
+              재사용합니다.<br />
+              HTML, Javascript 외 별도의 스타일 작업은 필요하지 않습니다.
+            </p>
+          </div>
+
+          <ul class="demo-body__list">
+            <li>
+              <h2>사용방법</h2>
+              <h3 class="demo__pre-type">HTML</h3>
+              <pre><code class="html">
+  &lt;article class="box-carousel" style="visibility: hidden"&gt; &lt;!-- 트리거 시킬 노드. 클래스명 자유롭게 부여하세요 --&gt;
+    &lt;div class="carousel-items"&gt; &lt;!-- carousel-items, carousel-item 클래스명 변경불가 --&gt;
+      &lt;!-- Items --&gt;
+      &lt;div class="carousel-item"&gt;1&lt;/div&gt;
+
+                  more box...
+
+      &lt;!-- // Items --&gt;
+    &lt;/div&gt;
+  &lt;/article&gt;
+
+</code></pre>
+              <h3 class="demo__pre-type">Javascript</h3>
+              <pre><code class="javascript">
+  function infiniteCarousel({ trigger, duration, reverse, pauseOnHover }) {
+    trigger = document.querySelectorAll(trigger);
+
+    trigger.forEach(trigger => {
+      trigger.style.overflow = 'hidden';
+      trigger.style.visibility = 'visible';
+
+      const items = trigger.querySelector('.carousel-items');
+      const item = trigger.querySelectorAll('.carousel-item');
+      const itemWidthArr = [...item].map(item => {
+        item.style.position = 'absolute';
+        return item.clientWidth;
+      });
+      let totalWidth = 0;
+
+      itemWidthArr.map((width, idx, arr) => {
+        if (idx === 0) {
+          totalWidth = itemWidthArr[arr.length - 1];
+        } else if (arr[idx - 1]) {
+          totalWidth = totalWidth + arr[idx - 1];
+        }
+        gsap.set(item[idx], {
+          x: totalWidth,
+        });
+      });
+
+      items.style.position = 'relative';
+      items.style.height = `${item[0].offsetHeight}px`;
+      items.style.left = `-${Math.max(...itemWidthArr)}px`;
+
+      const tl = gsap.timeline();
+      tl.to(item, duration * item.length, {
+        x: () => {
+          return reverse ? `-=${totalWidth}` : `+=${totalWidth}`;
+        },
+        ease: 'none',
+        repeat: -1,
+        modifiers: {
+          x: gsap.utils.unitize(x => {
+            return reverse ? (x < 0 ? (parseFloat(x) % totalWidth) + totalWidth : x) : parseFloat(x) % totalWidth;
+          }),
+        },
+      });
+
+      if (pauseOnHover) {
+        trigger.addEventListener('mouseover', () => {
+          tl.pause();
+        });
+
+        trigger.addEventListener('mouseleave', () => {
+          tl.play();
+        });
+      }
+    });
+  }
+
+  // Init
+  infiniteCarousel({
+    trigger: '.box-carousel', // 선택자
+    duration: 1, // 속도 설정
+    reverse: false, // 역방향 (우 --> 좌)
+    pauseOnHover: false, // 마우스 호버 시 애니메이션 멈춤
+  });
+
+</code></pre>
+            </li>
+            <li>
+              <h2>결과</h2>
+
+              <article class="box-carousel01" style="visibility: hidden">
+                <div class="carousel-items">
+                  <div class="carousel-item box" style="background-color: #8f62fb">1</div>
+                  <div class="carousel-item box" style="background-color: #85e1e3">2</div>
+                  <div class="carousel-item box" style="background-color: #98bd2d">3</div>
+                  <div class="carousel-item box" style="background-color: #1c53e2">4</div>
+                  <div class="carousel-item box" style="background-color: #f9e667">5</div>
+                  <div class="carousel-item box" style="background-color: #b2b08b">6</div>
+                  <div class="carousel-item box" style="background-color: #fc2811">7</div>
+                  <div class="carousel-item box" style="background-color: #edc93e">8</div>
+                  <div class="carousel-item box" style="background-color: #b7c53a">9</div>
+                  <div class="carousel-item box" style="background-color: #961939">10</div>
+                  <div class="carousel-item box" style="background-color: #7ca264">11</div>
+                  <div class="carousel-item box" style="background-color: #38a30f">12</div>
+                  <div class="carousel-item box" style="background-color: #ac6d9a">13</div>
+                  <div class="carousel-item box" style="background-color: #db269d">14</div>
+                  <div class="carousel-item box" style="background-color: #f5fbcf">15</div>
+                  <div class="carousel-item box" style="background-color: #88e98c">16</div>
+                  <div class="carousel-item box" style="background-color: #9e2259">17</div>
+                  <div class="carousel-item box" style="background-color: #0de66a">18</div>
+                  <div class="carousel-item box" style="background-color: #4d480f">19</div>
+                  <div class="carousel-item box" style="background-color: #c0830c">20</div>
+                </div>
+              </article>
+
+              <article class="text-carousel01" style="visibility: hidden">
+                <div class="carousel-items">
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <h2>역방향</h2>
+
+              <article class="box-carousel02" style="visibility: hidden">
+                <div class="carousel-items">
+                  <div class="carousel-item box" style="background-color: #8f62fb">1</div>
+                  <div class="carousel-item box" style="background-color: #85e1e3">2</div>
+                  <div class="carousel-item box" style="background-color: #98bd2d">3</div>
+                  <div class="carousel-item box" style="background-color: #1c53e2">4</div>
+                  <div class="carousel-item box" style="background-color: #f9e667">5</div>
+                  <div class="carousel-item box" style="background-color: #b2b08b">6</div>
+                  <div class="carousel-item box" style="background-color: #fc2811">7</div>
+                  <div class="carousel-item box" style="background-color: #edc93e">8</div>
+                  <div class="carousel-item box" style="background-color: #b7c53a">9</div>
+                  <div class="carousel-item box" style="background-color: #961939">10</div>
+                  <div class="carousel-item box" style="background-color: #7ca264">11</div>
+                  <div class="carousel-item box" style="background-color: #38a30f">12</div>
+                  <div class="carousel-item box" style="background-color: #ac6d9a">13</div>
+                  <div class="carousel-item box" style="background-color: #db269d">14</div>
+                  <div class="carousel-item box" style="background-color: #f5fbcf">15</div>
+                  <div class="carousel-item box" style="background-color: #88e98c">16</div>
+                  <div class="carousel-item box" style="background-color: #9e2259">17</div>
+                  <div class="carousel-item box" style="background-color: #0de66a">18</div>
+                  <div class="carousel-item box" style="background-color: #4d480f">19</div>
+                  <div class="carousel-item box" style="background-color: #c0830c">20</div>
+                </div>
+              </article>
+
+              <article class="text-carousel02" style="visibility: hidden">
+                <div class="carousel-items">
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <h2>마우스 hover 시 Pause/Play</h2>
+
+              <article class="box-carousel03" style="visibility: hidden">
+                <div class="carousel-items">
+                  <div class="carousel-item box" style="background-color: #8f62fb">1</div>
+                  <div class="carousel-item box" style="background-color: #85e1e3">2</div>
+                  <div class="carousel-item box" style="background-color: #98bd2d">3</div>
+                  <div class="carousel-item box" style="background-color: #1c53e2">4</div>
+                  <div class="carousel-item box" style="background-color: #f9e667">5</div>
+                  <div class="carousel-item box" style="background-color: #b2b08b">6</div>
+                  <div class="carousel-item box" style="background-color: #fc2811">7</div>
+                  <div class="carousel-item box" style="background-color: #edc93e">8</div>
+                  <div class="carousel-item box" style="background-color: #b7c53a">9</div>
+                  <div class="carousel-item box" style="background-color: #961939">10</div>
+                  <div class="carousel-item box" style="background-color: #7ca264">11</div>
+                  <div class="carousel-item box" style="background-color: #38a30f">12</div>
+                  <div class="carousel-item box" style="background-color: #ac6d9a">13</div>
+                  <div class="carousel-item box" style="background-color: #db269d">14</div>
+                  <div class="carousel-item box" style="background-color: #f5fbcf">15</div>
+                  <div class="carousel-item box" style="background-color: #88e98c">16</div>
+                  <div class="carousel-item box" style="background-color: #9e2259">17</div>
+                  <div class="carousel-item box" style="background-color: #0de66a">18</div>
+                  <div class="carousel-item box" style="background-color: #4d480f">19</div>
+                  <div class="carousel-item box" style="background-color: #c0830c">20</div>
+                </div>
+              </article>
+
+              <article class="text-carousel03" style="visibility: hidden">
+                <div class="carousel-items">
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                  <div class="carousel-item text">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                </div>
+              </article>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      addEventListener('load', () => {
+        document.querySelectorAll('pre code').forEach(el => {
+          hljs.highlightElement(el);
+        });
+
+        function infiniteCarousel({ trigger, duration, reverse, pauseOnHover }) {
+          trigger = document.querySelectorAll(trigger);
+
+          trigger.forEach(trigger => {
+            trigger.style.overflow = 'hidden';
+            trigger.style.visibility = 'visible';
+
+            const items = trigger.querySelector('.carousel-items');
+            const item = trigger.querySelectorAll('.carousel-item');
+            const itemWidthArr = [...item].map(item => {
+              item.style.position = 'absolute';
+              return item.clientWidth;
+            });
+            let totalWidth = 0;
+
+            itemWidthArr.map((width, idx, arr) => {
+              if (idx === 0) {
+                totalWidth = itemWidthArr[arr.length - 1];
+              } else if (arr[idx - 1]) {
+                totalWidth = totalWidth + arr[idx - 1];
+              }
+              gsap.set(item[idx], {
+                x: totalWidth,
+              });
+            });
+
+            items.style.position = 'relative';
+            items.style.height = `${item[0].offsetHeight}px`;
+            items.style.left = `-${Math.max(...itemWidthArr)}px`;
+
+            const tl = gsap.timeline();
+            tl.to(item, duration * item.length, {
+              x: () => {
+                return reverse ? `-=${totalWidth}` : `+=${totalWidth}`;
+              },
+              ease: 'none',
+              repeat: -1,
+              modifiers: {
+                x: gsap.utils.unitize(x => {
+                  return reverse
+                    ? x < 0
+                      ? (parseFloat(x) % totalWidth) + totalWidth
+                      : x
+                    : parseFloat(x) % totalWidth;
+                }),
+              },
+            });
+
+            if (pauseOnHover) {
+              trigger.addEventListener('mouseover', () => {
+                tl.pause();
+              });
+
+              trigger.addEventListener('mouseleave', () => {
+                tl.play();
+              });
+            }
+          });
+        }
+
+        infiniteCarousel({
+          trigger: '.box-carousel01',
+          duration: 1,
+        });
+
+        infiniteCarousel({
+          trigger: '.text-carousel01',
+          duration: 5,
+        });
+
+        infiniteCarousel({
+          trigger: '.box-carousel02',
+          duration: 1,
+          reverse: true,
+        });
+
+        infiniteCarousel({
+          trigger: '.text-carousel02',
+          duration: 5,
+          reverse: true,
+        });
+
+        infiniteCarousel({
+          trigger: '.box-carousel03',
+          duration: 1,
+          pauseOnHover: true,
+        });
+
+        infiniteCarousel({
+          trigger: '.text-carousel03',
+          duration: 5,
+          pauseOnHover: true,
+        });
+      });
+    </script>
+  </body>
+</html>
